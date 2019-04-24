@@ -10,22 +10,26 @@ import UIKit
 
 class ViewController: UIViewController {
 
-    lazy var game = Concentration(numberOfPairsOfCards: (cardButtons.count + 1) / 2)
+    private lazy var game = Concentration(numberOfPairsOfCards: numberOfPairsOfCards)
     
-    var flipCount = 0 {
+    var numberOfPairsOfCards: Int {
+        return (cardButtons.count + 1) / 2
+    }
+    
+    private(set) var flipCount = 0 {
         didSet{
             flipCountLabel.text = "Flips: \(flipCount)"
         }
     }
     
-    @IBOutlet weak var flipCountLabel: UILabel!
+    @IBOutlet private weak var flipCountLabel: UILabel!
     
     
-    @IBOutlet var cardButtons: [UIButton]!
+    @IBOutlet private var cardButtons: [UIButton]!
     
     
     
-    @IBAction func touchCard(_ sender: UIButton) {
+    @IBAction private func touchCard(_ sender: UIButton) {
         
         flipCount += 1
         
@@ -44,7 +48,7 @@ class ViewController: UIViewController {
        
     }
   
-    func updateViewFromModel() {
+    private func updateViewFromModel() {
         
         // 0..<cardButtons.count = cardButtons.indices  數組所有索引組成的可數區間
         for index in cardButtons.indices {
@@ -62,17 +66,19 @@ class ViewController: UIViewController {
         
     }
     
-    var emojiChoices = ["👻", "🎃", "🐶", "🐯", "🐳", "🍔", "🍱", "🍧", "🔥"]
+    private var emojiChoices = ["👻", "🎃", "🐶", "🐯", "🐳", "🍔", "🍱", "🍧", "🔥"]
     
-    var emoji = [Int : String]()
+    private var emoji = [Int : String]()
     
-    func emoji(for card: Card) -> String {
+    private func emoji(for card: Card) -> String {
         
         if emoji[card.identifier] == nil, emojiChoices.count > 0 {
  
-                let randomIndex = Int(arc4random_uniform(UInt32(emojiChoices.count)))
+//                let randomIndex = Int(arc4random_uniform(UInt32(emojiChoices.count)))
+            
+                
                 // 隨機到哪個 就remove掉emojiChoices的那個 再賦值給 var emoji = [Int : String]()
-                emoji[card.identifier] = emojiChoices.remove(at: randomIndex)
+                emoji[card.identifier] = emojiChoices.remove(at: emojiChoices.count.arc4random)
             
         }
         
@@ -82,3 +88,15 @@ class ViewController: UIViewController {
  
 }
 
+extension Int {
+    var arc4random: Int {
+        if self > 0 {
+            return Int(arc4random_uniform(UInt32(self)))
+        } else if self < 0 {
+            return -Int(arc4random_uniform(UInt32(abs(self))))
+        } else {
+          return 0
+        }
+        
+    }
+}
