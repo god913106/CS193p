@@ -9,7 +9,7 @@
 import UIKit
 
 class ViewController: UIViewController {
-
+    
     private lazy var game = Concentration(numberOfPairsOfCards: numberOfPairsOfCards)
     
     var numberOfPairsOfCards: Int {
@@ -18,8 +18,18 @@ class ViewController: UIViewController {
     
     private(set) var flipCount = 0 {
         didSet{
-            flipCountLabel.text = "Flips: \(flipCount)"
+            updateFlipCountLabel()
         }
+    }
+    
+    private func updateFlipCountLabel() {
+        let attributes: [NSAttributedString.Key:Any] = [
+            .strokeWidth : 5.0,
+            .strokeColor : #colorLiteral(red: 1, green: 0.5781051517, blue: 0, alpha: 1)
+            
+        ]
+        let attributedString = NSAttributedString(string: "Flips: \(flipCount)", attributes: attributes)
+        flipCountLabel.attributedText = attributedString
     }
     
     @IBOutlet private weak var flipCountLabel: UILabel!
@@ -36,8 +46,8 @@ class ViewController: UIViewController {
         
         //原 cardButtons.index(of: sender)!
         if let cardNumber = cardButtons.firstIndex(of: sender){
-    
-//            flipCard(withEmoji: emojiChoices[cardNumber], on: sender)
+            
+            //            flipCard(withEmoji: emojiChoices[cardNumber], on: sender)
             game.chooseCard(at: cardNumber)
             // so now, we have to update our view from the model, our view is now a little bit out of sync with the model, because when we choose this card, that could have caused the game to change, so we need a method like updateViewFromModel or something like that, some kind of func down here.
             updateViewFromModel()
@@ -45,9 +55,9 @@ class ViewController: UIViewController {
             print("chosen card card was not in cardButtons")
         }
         
-       
+        
     }
-  
+    
     private func updateViewFromModel() {
         
         // 0..<cardButtons.count = cardButtons.indices  數組所有索引組成的可數區間
@@ -58,6 +68,7 @@ class ViewController: UIViewController {
             if card.isFaceUp {
                 button.setTitle(emoji(for: card), for: .normal)
                 button.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+                
             }else {
                 button.setTitle("", for: .normal)
                 button.backgroundColor = card.isMatched ? #colorLiteral(red: 1, green: 0.5781051517, blue: 0, alpha: 0) : #colorLiteral(red: 1, green: 0.5781051517, blue: 0, alpha: 1)
@@ -66,26 +77,29 @@ class ViewController: UIViewController {
         
     }
     
-    private var emojiChoices = ["👻", "🎃", "🐶", "🐯", "🐳", "🍔", "🍱", "🍧", "🔥"]
+    //    private var emojiChoices = ["👻", "🎃", "🐶", "🐯", "🐳", "🍔", "🍱", "🍧", "🔥"]
+    private var emojiChoices = "👻🎃🐶🐯🐳🍔🍱🍧🔥"
     
-    private var emoji = [Int : String]()
+    // Type 'Card' does not conform to protocol 'Hashable'
+    private var emoji = [Card : String]()
     
     private func emoji(for card: Card) -> String {
         
-        if emoji[card.identifier] == nil, emojiChoices.count > 0 {
- 
-//                let randomIndex = Int(arc4random_uniform(UInt32(emojiChoices.count)))
+        if emoji[card] == nil, emojiChoices.count > 0 {
             
-                
-                // 隨機到哪個 就remove掉emojiChoices的那個 再賦值給 var emoji = [Int : String]()
-                emoji[card.identifier] = emojiChoices.remove(at: emojiChoices.count.arc4random)
+            //Cs193p P5 string 55:00
+            // randomStringIndex =從emojiChoices這個字串”👻🎃🐶🐯🐳🍔🍱🍧🔥"第一個 startIndex，再隨機亂數取其中的字符character
+            let randomStringIndex = emojiChoices.index(emojiChoices.startIndex, offsetBy: emojiChoices.count.arc4random)
+            
+            // 隨機到哪個 就remove掉emojiChoices的那個 再賦值給 var emoji = [Int : String]()
+            emoji[card] = String(emojiChoices.remove(at: randomStringIndex))
             
         }
         
-        return emoji[card.identifier] ?? "?"
+        return emoji[card] ?? "?"
     }
-
- 
+    
+    
 }
 
 extension Int {
@@ -95,7 +109,7 @@ extension Int {
         } else if self < 0 {
             return -Int(arc4random_uniform(UInt32(abs(self))))
         } else {
-          return 0
+            return 0
         }
         
     }

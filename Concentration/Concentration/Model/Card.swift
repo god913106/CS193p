@@ -8,11 +8,17 @@
 
 import Foundation
 
-struct Card {
+struct Card : Hashable {
+    
+    // 'Hashable.hashValue' is deprecated as a protocol requirement; conform type 'Card' to 'Hashable' by implementing 'hash(into:)' instead
+    var hashValue: Int { return identifier }
+    static func ==(lhs: Card, rhs: Card) -> Bool {
+        return lhs.identifier == rhs.identifier
+    }
     
     var isFaceUp = false
     var isMatched = false
-    var identifier : Int
+    private var identifier : Int
     
     private static var identifierFactory = 0
     

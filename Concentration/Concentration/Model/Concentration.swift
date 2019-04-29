@@ -8,23 +8,30 @@
 
 import Foundation
 
-class Concentration {
+struct Concentration {
     
     private(set) var cards = [Card]()
     
     private var indexOfOneAndOnlyFaceUpCard: Int?{
         get {
-            var foundIndex : Int?
-            for index in cards.indices {
-                if cards[index].isFaceUp {
-                    if foundIndex == nil {
-                        foundIndex = index //first card
-                    } else {
-                        return nil // turn second card so return nil
-                    }
-                }
-            }
-            return foundIndex
+            
+            // faceUpCardIndices : [Array.Index]
+            //            let faceUpCardIndices = cards.indices.filter{ cards[$0].isFaceUp }
+            //            return faceUpCardIndices.count == 1 ? faceUpCardIndices.first : nil
+            //            let ch = "hello".oneAndOnly //return "h"
+            return cards.indices.filter{ cards[$0].isFaceUp }.oneAndOnly
+            
+            //            var foundIndex : Int?
+            //            for index in cards.indices {
+            //                if cards[index].isFaceUp {
+            //                    if foundIndex == nil {
+            //                        foundIndex = index //first card
+            //                    } else {
+            //                        return nil // turn second card so return nil
+            //                    }
+            //                }
+            //            }
+            //            return foundIndex
         }
         set{
             for index in cards.indices {
@@ -53,13 +60,13 @@ class Concentration {
      (3)有一張卡面朝上，然後選了另一張卡，現在要試著配對，看看是否匹配的。
      
      */
-    func chooseCard(at index: Int) {
+    mutating func chooseCard(at index: Int) {
         // assertion，斷言，通過聲明一個斷言來確保某個必要的條件是滿足的，以便繼續執行接下來的代碼。 index = -1 minus one no in the cards
         assert(cards.indices.contains(index), "Concentration.chooseCard(at:\(index)):chosen index no in the cards")
         if !cards[index].isMatched {
             if let matchIndex = indexOfOneAndOnlyFaceUpCard, matchIndex != index {
                 //check if cards match
-                if cards[matchIndex].identifier == cards[index].identifier {
+                if cards[matchIndex] == cards[index] {
                     cards[matchIndex].isMatched = true
                     cards[index].isMatched = true
                 }
@@ -82,5 +89,12 @@ class Concentration {
         }
         
         //TODO: shuffle the cards
+    }
+}
+
+
+extension Collection {
+    var oneAndOnly: Element? {
+        return count == 1 ? first : nil
     }
 }
